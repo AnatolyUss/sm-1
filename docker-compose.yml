@@ -1,0 +1,41 @@
+# Create local environment:
+# {/usr/local/bin/}docker compose -f {/path/to}/py-mirror-1/docker-compose.yml -p py-mirror-1 up -d
+version: '3.8'
+services:
+  mysql:
+    image: mysql:latest
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE_NAME}
+      MYSQL_USER: ${MYSQL_USERNAME}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - ${MYSQL_PORT}:${MYSQL_PORT}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - app-network
+
+  postgres:
+    image: postgres:16.4
+    container_name: postgres-container
+    restart: unless-stopped
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    environment:
+      - POSTGRES_USER=${POSTGRES_USERNAME}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DATABASE_NAME}
+    networks:
+      - app-network
+    volumes:
+      - postgres_16_data:/var/lib/postgresql/data
+
+volumes:
+  mysql-data:
+  postgres_16_data:
+
+networks:
+  app-network:
+    driver: bridge
